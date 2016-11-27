@@ -190,7 +190,11 @@ void screen::create_project(database &db)
             if(p._code)
                 stage = 2;
             else
+            {
+                buffer << std::endl;
+                buffer << "colaboradores: " << std::endl << std::endl;
                 stage = 3;
+            }
         }
         else if(stage == 2)
         {
@@ -205,24 +209,45 @@ void screen::create_project(database &db)
         }
         else if(stage == 3)
         {
-            std::cout << buffer.str() << std::endl;
-            std::cout << "Colaboradores: " << std::endl;
-            for(const u_int& i : partner_set)
-                std::cout << db.search_partner(i) << std::endl;
+            std::cout << buffer.str();
+            
             std::cout << "Deseja adicionar um colaborador?(s/n) ";
             std::getline(std::cin, opt);
             if(is_letter(opt,'s'))
             {
                 manager::partner p = get_partner(db);
-                if(p._code)
-                    partner_set.insert(p._code);   
+                if(p._code && partner_set.insert(p._code).second)
+                    buffer << p << std::endl;
             }
             else if(is_letter(opt,'n'))
                 stage = 4;
         }
         else if(stage == 4)
         {
-            return;
+            std::cout << buffer.str();
+            std::cout << "Deseja adicionar este projeto?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s')) 
+            {
+                manager::project p;
+                p._name = name;
+                p._partners = partner_set;
+                db.insert_project(p);
+                buffer << "Projeto adicionado!" << std::endl;
+                stage = 5;
+            }
+            else if(is_letter(opt,'n'))
+                stage = 5;
+        }
+        else if(stage == 5)
+        {
+            std::cout << buffer.str();
+            std::cout << "Deseja adicionar mais projetos?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
         }
     }
 }
