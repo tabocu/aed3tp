@@ -41,7 +41,11 @@ void screen::init(database &db)
         if(!opt.compare("1")) screen::manage_partner(db);
         else if(!opt.compare("2")) return;
         else if(!opt.compare("3")) return;
-        else if(!opt.compare("9")) return;
+        else if(!opt.compare("9")) 
+        {
+            std::cout << "\033[2J\033[1;1H";
+            return;
+        }
     }
 }
 
@@ -51,7 +55,6 @@ void screen::manage_partner(database &db)
 
     while(1)
     {
-        std::cout << "\033[2J\033[1;1H";
         std::cout << "Project Manager" << std::endl;
         std::cout << std::endl;
         std::cout << "Gerenciar Colaborador" << std::endl;
@@ -72,56 +75,69 @@ void screen::manage_partner(database &db)
 
 void screen::create_partner(database &db)
 {
-    std::string name = "", email = "", opt = "";
-    bool empty = true;
     
+    std::stringstream buffer;
+    std::string name = "", email = "", opt = "";
+
+    u_char stage = 1;
     while(1)
     { 
-        opt = "";
-        std::cout << "\033[2J\033[1;1H";
-        std::cout << "Cadastrar colaborador" << std::endl;
-        std::cout << std::endl;
-
-        std::cout << "Nome: " << name;
-        if(empty)
+        if(stage == 1)
+        {
+            buffer.clear();
+            buffer << "\033[2J\033[1;1H";
+            buffer << "Cadastrar colaborador:" << std::endl;
+            buffer << std::endl;
+            buffer << "Nome: ";
+            std::cout << buffer.str();
             std::getline(std::cin, name);
-        else
-            std::cout << std::endl;
-        std::cout << std::endl;
-
-        std::cout << "Email: " << email;
-        if(empty)
-            std::getline(std::cin, email);
-        else
-            std::cout << std::endl;
-        std::cout << std::endl;
-
-        bool val_name = db.validate_partners_name(name);
-
-        if(val_name) //INVALIDO
-        {
-            printf("O colaborador \"%s\""
-                "já existe. Deseja incluir outro? (s/n) ", 
-                name.c_str());
-            name = email = "";
-            std::getline(std::cin, opt);
-            if(is_letter(opt,'y')) continue;
-            if(is_letter(opt,'n')) break;
+            buffer << name << std::endl;
+            manager::partner p = db.search_partner(name);
+            if(p._code)
+                stage = 2;
+            else
+                stage = 3;
         }
-        else
+        else if(stage == 2)
         {
-            std::cout << "Deseja incluir? (s/n) ";
-            empty = false;
+            std::cout << buffer.str();
+            std::cout << "Já existe um colaborador com este nome!" << std::endl;
+            std::cout << "Deseja cadastrar outro?(s/n) ";
             std::getline(std::cin, opt);
-            if(is_letter(opt,'y'))
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
+        }
+        else if(stage == 3)
+        {
+            buffer << "Email: ";
+            std::cout << buffer.str();
+            std::getline(std::cin, email);
+            buffer << email << std::endl;
+            std::cout << "Deseja adicionar este colaborador?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s')) 
             {
                 manager::partner p;
                 p._name = name;
                 p._email = email;
                 db.insert_partner(p);
-                break;
+                buffer << "Colaborador adicionado!" << std::endl;
+                stage = 4;
             }
-            if(is_letter(opt,'n')) break;
+            else if(is_letter(opt,'n'))
+                stage = 4;
+        }
+        else if(stage == 4)
+        {
+            std::cout << buffer.str();
+            std::cout << "Deseja adicionar mais contatos?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
         }
     }
 }
