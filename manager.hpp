@@ -18,6 +18,7 @@ namespace manager
         virtual u_int size();
         virtual void print(std::ostream &os) const;
 
+
     private:
 
         const u_int _base_size = 4;

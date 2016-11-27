@@ -375,8 +375,7 @@ void strcpy_test()
 void interface_test()
 {
     database db;
-    //screen::create_partner(db);
-    screen::get_partner(db);
+    screen::init(db);
 }
 
 int main(int argc, char *argv[])

@@ -20,6 +20,31 @@ bool is_letter(const std::string &opt, const char &copt)
     return !opt.empty() && (toupper(opt[0]) == toupper(copt));
 }
 
+void screen::init(database &db)
+{
+    std::string opt = "";
+
+    while(1)
+    {
+        std::cout << "\033[2J\033[1;1H";
+        std::cout << "Project Manager" << std::endl;
+        std::cout << std::endl;
+        std::cout << "(1) Gerenciar colaboradores" << std::endl;
+        std::cout << "(2) Gerenciar projetos"      << std::endl;
+        std::cout << "(3) Gerenciar tarefas"       << std::endl;
+        std::cout << std::endl;
+        std::cout << "(9) Sair" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Opção: ";
+        std::getline(std::cin, opt);
+        
+        if(!opt.compare("1")) return;
+        else if(!opt.compare("2")) return;
+        else if(!opt.compare("3")) return;
+        else if(!opt.compare("9")) return;
+    }
+}
+
 void screen::create_partner(database &db)
 {
     std::string name = "", email = "", opt = "";
@@ -78,11 +103,62 @@ void screen::create_partner(database &db)
 
 void screen::create_project(database &db)
 {
-    std::string name = "", opt = "";
-    bool empty = true;
     
+    std::stringstream buffer;
+    std::string name = "", opt = "";
+    std::set<u_int> partner_set;
+
+    u_char stage = 1;
     while(1)
     { 
+        if(stage == 1)
+        {
+            buffer.clear();
+            buffer << "\033[2J\033[1;1H";
+            buffer << "Cadastrar projeto:" << std::endl;
+            buffer << std::endl;
+            buffer << "Nome: ";
+            std::cout << buffer.str();
+            std::getline(std::cin, name);
+            buffer << name << std::endl;
+            manager::project p = db.search_project(name);
+            if(p._code)
+                stage = 2;
+            else
+                stage = 3;
+        }
+        else if(stage == 2)
+        {
+            std::cout << buffer.str();
+            std::cout << "Já existe um projeto com este nome!" << std::endl;
+            std::cout << "Deseja cadastrar outro?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
+        }
+        else if(stage == 3)
+        {
+            std::cout << buffer.str() << std::endl;
+            std::cout << "Colaboradores: " << std::endl;
+            for(const u_int& i : partner_set)
+                std::cout << db.search_partner(i) << std::endl;
+            std::cout << "Deseja adicionar um colaborador?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+            {
+                manager::partner p = get_partner(db);
+                if(p._code)
+                    partner_set.insert(p._code);   
+            }
+            else if(is_letter(opt,'n'))
+                stage = 4;
+        }
+        else if(stage == 4)
+        {
+            return;
+        }
     }
 }
 
