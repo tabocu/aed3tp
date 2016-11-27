@@ -39,7 +39,7 @@ void screen::init(database &db)
         std::getline(std::cin, opt);
         
         if(!opt.compare("1")) screen::manage_partner(db);
-        else if(!opt.compare("2")) return;
+        else if(!opt.compare("2")) screen::manage_project(db);
         else if(!opt.compare("3")) return;
         else if(!opt.compare("9")) 
         {
@@ -55,6 +55,7 @@ void screen::manage_partner(database &db)
 
     while(1)
     {
+        std::cout << "\033[2J\033[1;1H";
         std::cout << "Project Manager" << std::endl;
         std::cout << std::endl;
         std::cout << "Gerenciar Colaborador" << std::endl;
@@ -69,6 +70,29 @@ void screen::manage_partner(database &db)
         
         if(!opt.compare("1")) screen::create_partner(db);
         else if(!opt.compare("2")) screen::get_partner(db);
+        else if(!opt.compare("9")) return;
+    }
+}
+
+void screen::manage_project(database &db)
+{
+     std::string opt = "";
+
+    while(1)
+    {
+        std::cout << "\033[2J\033[1;1H";
+        std::cout << "Project Manager" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Gerenciar Projeto" << std::endl;
+        std::cout << std::endl;
+        std::cout << "(1) Criar projeto" << std::endl;
+        std::cout << std::endl;
+        std::cout << "(9) Voltar" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Opção: ";
+        std::getline(std::cin, opt);
+        
+        if(!opt.compare("1")) screen::create_project(db);
         else if(!opt.compare("9")) return;
     }
 }
