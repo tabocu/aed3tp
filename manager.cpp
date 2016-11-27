@@ -30,16 +30,16 @@ void print_priority(std::ostream &os, const manager::priority &p)
     switch(p)
     {
         case manager::priority::lowest:
-            os << std::left << "Lowest";
+            os << std::left << "1 - Baixa";
             break;
         case manager::priority::low:
-            os << std::left << "Low";
+            os << std::left << "2 - Média baixa";
             break;
         case manager::priority::high:
-            os << std::left << "High";
+            os << std::left << "3 - Média alta";
             break;
         case manager::priority::highest:
-            os << std::left << "Highest";
+            os << std::left << "4 - Alta";
             break;
         default:
             os << std::left << "N/A";

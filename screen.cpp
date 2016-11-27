@@ -21,7 +21,7 @@ bool is_letter(const std::string &opt, const char &copt)
     return !opt.empty() && (toupper(opt[0]) == toupper(copt));
 }
 
-bool parse_date(std::string s)
+bool validate_date(std::string s)
 {
     if(s.size() != 10) return false;
 
@@ -316,9 +316,10 @@ void screen::create_task(database &db)
 {
     
     std::stringstream buffer;
-    std::string description = "", opt = "";
+    std::string description = "", date = "", priority, opt = "";
     u_int project = 0, partner = 0;
-    u_long dead_line;
+    manager::priority pri;
+    
     bool no_partners;
 
     u_char stage = 1;
@@ -363,7 +364,7 @@ void screen::create_task(database &db)
                 }
             }
             else if(is_letter(opt,'c'))
-                stage = 5; 
+                stage = 6; 
         }
         else if(stage == 3)
         {
@@ -387,11 +388,58 @@ void screen::create_task(database &db)
                     {
                         buffer << "Colaborador: " << pt._code << " - ";
                         buffer << pt._name << std::endl;
-                        stage = 5;
+                        buffer << "Data limite (dd/mm/aaaa): ";
+                        stage = 4;
                     }
                 }
         }
+        else if(stage == 4)
+        {
+            std::cout << buffer.str();
+            std::getline(std::cin, date);
+            if(validate_date(date))
+            {
+                buffer << date << std::endl;
+                buffer << "Prioridade: ";
+                stage = 5;
+            }
+
+        }
         else if(stage == 5)
+        {
+            std::cout << buffer.str() << std::endl;
+            std::cout << "1 - Baixa" << std::endl;
+            std::cout << "2 - Média baixa" << std::endl;
+            std::cout << "3 - Média alta" << std::endl;
+            std::cout << "4 - Alta" << std::endl;
+            std::cout << "Opção: ";
+            std::getline(std::cin, priority);
+            if(!priority.compare("1"))
+            {
+                pri = manager::priority::lowest;
+                buffer << "1 - Baixa" << std::endl;
+                stage = 6;
+            }
+            else if(!priority.compare("2"))
+            {
+                pri = manager::priority::low;
+                buffer << "2 - Média baixa" << std::endl;
+                stage = 6;
+            }
+            else if(!priority.compare("3"))
+            {
+                pri = manager::priority::high;
+                buffer << "3 - Média alta" << std::endl;
+                stage = 6;
+            }
+            else if(!priority.compare("4"))
+            {
+                pri = manager::priority::highest;
+                buffer << "4 - Alta" << std::endl;
+                stage = 6;
+            }
+        }
+        else if(stage == 6)
         {
             std::cout << buffer.str();
             std::cout << "Deseja adicionar mais tarefas?(s/n) ";
