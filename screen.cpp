@@ -40,7 +40,7 @@ void screen::init(database &db)
         
         if(!opt.compare("1")) screen::manage_partner(db);
         else if(!opt.compare("2")) screen::manage_project(db);
-        else if(!opt.compare("3")) return;
+        else if(!opt.compare("3")) screen::manage_task(db);
         else if(!opt.compare("9")) 
         {
             std::cout << "\033[2J\033[1;1H";
@@ -95,6 +95,31 @@ void screen::manage_project(database &db)
         
         if(!opt.compare("1")) screen::create_project(db);
         if(!opt.compare("2")) screen::get_project(db);
+        else if(!opt.compare("9")) return;
+    }
+}
+
+void screen::manage_task(database &db)
+{
+     std::string opt = "";
+
+    while(1)
+    {
+        std::cout << "\033[2J\033[1;1H";
+        std::cout << "Project Manager" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Gerenciar Tarefa" << std::endl;
+        std::cout << std::endl;
+        std::cout << "(1) Criar tarefa" << std::endl;
+        std::cout << "(2) Pesquisar tarefa" << std::endl;
+        std::cout << std::endl;
+        std::cout << "(9) Voltar" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Opção: ";
+        std::getline(std::cin, opt);
+        
+        if(!opt.compare("1")) return;
+        if(!opt.compare("2")) return;
         else if(!opt.compare("9")) return;
     }
 }
