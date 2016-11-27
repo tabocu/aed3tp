@@ -117,7 +117,8 @@ void manager::project::write(char * buffer)
     
     buffer += 2 + _name.size();
     u_short partners = datastream::read_short(buffer);
-
+     
+    buffer += 2;
     _partners.clear();
     for(u_int i = 0; i < partners; ++i)
     {

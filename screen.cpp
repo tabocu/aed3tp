@@ -194,7 +194,7 @@ void screen::create_project(database &db)
             else
             {
                 buffer << std::endl;
-                buffer << "colaboradores: " << std::endl << std::endl;
+                buffer << "Colaboradores associados:" << std::endl;
                 stage = 3;
             }
         }
@@ -233,8 +233,9 @@ void screen::create_project(database &db)
             {
                 manager::project p;
                 p._name = name;
-                p._partners = partner_set;
+                p._partners = std::set<u_int>(partner_set);
                 db.insert_project(p);
+
                 buffer << "Projeto adicionado!" << std::endl;
                 stage = 5;
             }
@@ -372,7 +373,13 @@ manager::project screen::get_project(database &db)
             manager::project p = db.search_project(key);
             code = p._code;
             if(code)
+            {
                 buffer << p << std::endl;
+                buffer << "Colaboradores associados:" << std::endl;
+                for(std::set<u_int>::iterator it = p._partners.begin();
+                    it != p._partners.end(); ++it)
+                    buffer << db.search_partner(*it) << std::endl;
+            }
             else
                 buffer << "Projeto não encontrado!" << std::endl;
 
@@ -397,7 +404,13 @@ manager::project screen::get_project(database &db)
             manager::project p = db.search_project(code);
             code = p._code;
             if(code)
+            {
                 buffer << p << std::endl;
+                buffer << "Colaboradores associados:" << std::endl;
+                for(std::set<u_int>::const_iterator it = p._partners.begin();
+                    it != p._partners.end(); ++it)
+                    buffer << db.search_partner(*it) << std::endl;
+            }
             else
                 buffer << "Projeto não encontrado!" << std::endl;
 
