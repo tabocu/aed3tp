@@ -228,6 +228,7 @@ std::ostream& manager::operator<<(std::ostream &os, const manager::date &date)
     os << std::setfill('0') << std::setw(2) << date._m;
     os << "/";
     os << std::setfill('0') << std::setw(4) << date._Y;
+    os << std::setfill(' ');
     return os;
 }
 //manager::date - end

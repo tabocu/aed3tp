@@ -6,7 +6,9 @@ _project_record(2,"project_record.db"),
 _project_name_index(2,100,"project_name.db.index"),
 _partner_record(2,"partner_record.db"),
 _partner_name_index(2,100,"partner_name.db.index"),
-_task_record(2,"task_record.db")
+_task_record(2,"task_record.db"),
+_project_task_index(2,"project_task.db.index"),
+_partner_task_index(2,"partner_task.db.index")
 {}
 
 void database::insert_project(manager::project &project)
@@ -123,4 +125,16 @@ bool database::validate_project_partners(manager::project &project)
         if(!_partner_record.contain(*it))
             return false;
     return true;
+}
+
+void database::insert_task(manager::task &task)
+{
+    _task_record.insert(task);
+    _project_task_index.insert(task._project,task._code);
+    _partner_task_index.insert(task._partner,task._code);
+}
+
+manager::task database::search_task(const u_int &code)
+{
+    return _task_record.search(code);
 }

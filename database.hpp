@@ -26,7 +26,9 @@ public:
     
     bool validate_partners_name(const std::string &name);
     bool validate_project_partners(manager::project &project);
-    //void insert_task(manager::task &task);
+    
+    void insert_task(manager::task &task);
+    manager::task search_task(const u_int &code);
 
 #ifndef DEBUG   
 private:
@@ -38,6 +40,8 @@ private:
     tree::b_string _partner_name_index;
 
     record<manager::task> _task_record;
+    tree::b_plus _project_task_index;
+    tree::b_plus _partner_task_index;
 };
 
 #endif

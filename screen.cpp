@@ -150,7 +150,7 @@ void screen::manage_task(database &db)
         std::getline(std::cin, opt);
         
         if(!opt.compare("1")) screen::create_task(db);
-        if(!opt.compare("2")) return;
+        if(!opt.compare("2")) screen::get_task(db);
         else if(!opt.compare("9")) return;
     }
 }
@@ -364,7 +364,7 @@ void screen::create_task(database &db)
                 }
             }
             else if(is_letter(opt,'c'))
-                stage = 6; 
+                stage = 7; 
         }
         else if(stage == 3)
         {
@@ -440,6 +440,30 @@ void screen::create_task(database &db)
             }
         }
         else if(stage == 6)
+        {
+            std::cout << buffer.str();
+            std::cout << "Deseja salvar a tarefa?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+            {
+                manager::task t;
+                t._description = description;
+                t._project = project;
+                t._partner = partner;
+                t._priority = pri;
+                t._dead_line._d = (date[0]-'0')*10 + date[1]-'0';
+                t._dead_line._m = (date[3]-'0')*10 + date[4]-'0';
+                t._dead_line._Y = (date[6]-'0')*1000 
+                    + (date[7]-'0')*100 + (date[8]-'0')*10 + date[9]-'0';
+                
+                db.insert_task(t);
+                stage = 7;
+            }
+            else if(is_letter(opt,'n'))
+                stage = 7;
+            
+        }
+        else if(stage == 7)
         {
             std::cout << buffer.str();
             std::cout << "Deseja adicionar mais tarefas?(s/n) ";
@@ -630,3 +654,66 @@ manager::project screen::get_project(database &db)
     }
 }
 
+manager::task screen::get_task(database &db)
+{
+    std::stringstream buffer;
+    std::string key, opt;
+    key = opt = "";
+    u_int code = 0;
+
+    u_char stage = 1;
+    while(1)
+    {
+        if(stage == 1)
+        {
+            buffer.clear();
+            buffer << "\033[2J\033[1;1H";
+            buffer << "Buscar Tarefa" << std::endl;
+            buffer << std::endl;
+            std::cout << buffer.str();
+            std::cout << "Pesquisar por código(c) ou cancelar(x)? ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'c')) stage = 3;
+            else if(is_letter(opt,'x')) return manager::task();
+        }
+        else if(stage == 3)
+        {
+            buffer << "Digite o código: ";
+            std::cout << buffer.str();
+            std::getline(std::cin, key);
+            char * v;
+            code = strtoul(key.c_str(),&v,10);
+            if(*v || 
+                key.find('-') != std::string::npos ||
+                key.find('+') != std::string::npos)
+            {
+                buffer.clear();
+                continue;
+            }
+            buffer << key << std::endl;
+            
+            manager::task t = db.search_task(code);
+            code = t._code;
+            if(code)
+                buffer << t << std::endl;
+            else
+                buffer << "Tarefa não encontrada!" << std::endl;
+
+            stage = 4;
+        }
+        else if(stage == 4)
+        {
+            std::cout << buffer.str();
+
+            std::cout << "Deseja pesquisar outra tarefa?(s/n) ";
+            std::getline(std::cin, opt);
+
+            if(is_letter(opt,'s'))
+            {
+                buffer.clear();
+                stage = 1;
+            }
+            else if(is_letter(opt,'n')) return db.search_task(code);
+        }
+    }
+}
