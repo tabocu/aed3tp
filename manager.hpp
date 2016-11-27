@@ -8,7 +8,16 @@
 
 namespace manager
 {
-    
+    class date
+    {
+    public:
+        u_int _d = 0;
+        u_int _m = 0;
+        u_int _Y = 0;
+    };
+
+    std::ostream& operator<<(std::ostream &os, const manager::date &date);
+
     class entry
     {
     public:
@@ -60,14 +69,14 @@ namespace manager
         std::string _description;
         u_int _project;
         u_int _partner;
-        u_long _dead_line;
+        manager::date _dead_line;
         manager::priority _priority;
     private:
 
-        const u_int _base_size = 19;
+        const u_int _base_size = 23;
     };
 
-    class partner : public entry 
+    class partner : public entry
     {
     public:
         void read(char * buffer);
@@ -83,4 +92,4 @@ namespace manager
     };
 }
 
-#endif 
+#endif

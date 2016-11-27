@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <iomanip>
 
 //internal non-member function - begin
 
@@ -14,28 +15,11 @@ void print_u_int(std::ostream &os, const u_int &i)
     os << " |";
 }
 
-void print_u_long(std::ostream &os, const u_long &l)
-{
-
-}
-
 void print_string(std::ostream &os, const std::string &s)
 {
     os << "| ";
     os.width(30);
     os << std::left << s;
-    os << " |";
-}
-
-void print_date(std::ostream &os, const long &l)
-{
-    const time_t rawtime = static_cast<const time_t>(l);
-    struct tm * dt = localtime(&rawtime);
-    char buffer[11];
-    strftime(buffer,11,"%d/%m/%Y",dt);
-    os << "| ";
-    os.width(10);
-    os << std::left << buffer;
     os << " |";
 }
 
@@ -94,14 +78,14 @@ void manager::entry::print(std::ostream &os) const
 
 void manager::project::read(char * buffer)
 {
-    entry::read(buffer);    
+    entry::read(buffer);
     buffer += entry::size();
-    datastream::write_UTF(buffer,_name); 
+    datastream::write_UTF(buffer,_name);
     buffer += 2 + _name.size();
     datastream::write_short(buffer,_partners.size());
     buffer += 2;
     for(std::set<u_int>::const_iterator it = _partners.begin();
-        it != _partners.end(); 
+        it != _partners.end();
         ++it)
     {
         datastream::write_int(buffer,*it);
@@ -114,10 +98,10 @@ void manager::project::write(char * buffer)
     entry::write(buffer);
     buffer += entry::size();
     _name = datastream::read_UTF(buffer);
-    
+
     buffer += 2 + _name.size();
     u_short partners = datastream::read_short(buffer);
-     
+
     buffer += 2;
     _partners.clear();
     for(u_int i = 0; i < partners; ++i)
@@ -144,7 +128,7 @@ void manager::project::print(std::ostream &os) const
 
 void manager::task::read(char * buffer)
 {
-    entry::read(buffer);    
+    entry::read(buffer);
     buffer += entry::size();
     datastream::write_UTF(buffer,_description);
     buffer += 2 + _description.size();
@@ -152,8 +136,12 @@ void manager::task::read(char * buffer)
     buffer += 4;
     datastream::write_int(buffer,_partner);
     buffer += 4;
-    datastream::write_long(buffer,_dead_line);
-    buffer += 8;
+    datastream::write_int(buffer,_dead_line._d);
+    buffer += 4;
+    datastream::write_int(buffer,_dead_line._m);
+    buffer += 4;
+    datastream::write_int(buffer,_dead_line._Y);
+    buffer += 4;
     datastream::write_char(buffer,_priority);
 }
 
@@ -167,8 +155,12 @@ void manager::task::write(char * buffer)
     buffer += 4;
     _partner = datastream::read_int(buffer);
     buffer += 4;
-    _dead_line = datastream::read_long(buffer);
-    buffer += 8;
+    _dead_line._d = datastream::read_int(buffer);
+    buffer += 4;
+    _dead_line._m = datastream::read_int(buffer);
+    buffer += 4;
+    _dead_line._Y = datastream::read_int(buffer);
+    buffer += 4;
     _priority = static_cast<priority>(datastream::read_char(buffer));
 
 }
@@ -184,7 +176,7 @@ void manager::task::print(std::ostream &os) const
     print_string(os,_description);
     print_u_int(os,_project);
     print_u_int(os,_partner);
-    print_date(os,_dead_line);
+    os << "| " << _dead_line << " |";
     print_priority(os,_priority);
 }
 
@@ -194,13 +186,13 @@ void manager::task::print(std::ostream &os) const
 
 void manager::partner::read(char * buffer)
 {
-    entry::read(buffer);    
+    entry::read(buffer);
     buffer += entry::size();
     datastream::write_UTF(buffer,_name);
     buffer += 2 + _name.size();
     datastream::write_UTF(buffer,_email);
     buffer += 2 + _email.size();
-    
+
 }
 
 void manager::partner::write(char * buffer)
@@ -228,6 +220,18 @@ void manager::partner::print(std::ostream &os) const
 
 //manager::partner - end
 
+//manager::date - begin
+std::ostream& manager::operator<<(std::ostream &os, const manager::date &date)
+{
+    os << std::setfill('0') << std::setw(2) << date._d;
+    os << "/";
+    os << std::setfill('0') << std::setw(2) << date._m;
+    os << "/";
+    os << std::setfill('0') << std::setw(4) << date._Y;
+    return os;
+}
+//manager::date - end
+
 //manager non-member functions - begin
 
 std::ostream& manager::operator<<(std::ostream &os, const manager::entry &entry)
@@ -237,4 +241,3 @@ std::ostream& manager::operator<<(std::ostream &os, const manager::entry &entry)
 }
 
 //manager non-member functions - end
-

@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 bool is_yes(std::string opt)
 {
@@ -18,6 +19,36 @@ bool is_no(std::string opt)
 bool is_letter(const std::string &opt, const char &copt)
 {
     return !opt.empty() && (toupper(opt[0]) == toupper(copt));
+}
+
+bool parse_date(std::string s)
+{
+    if(s.size() != 10) return false;
+
+    for(u_int i = 0; i < s.size(); ++i)
+    {
+        if(i == 2 || i == 5)
+        {
+            if(s[i] != '/') return false;
+        }
+        else
+        {
+            if(s[i] < '0' || s[i] > '9') return false;
+        }
+    }
+
+    int d = (s[0]-'0')*10 + s[1]-'0';
+    int m = (s[3]-'0')*10 + s[4]-'0';
+    int Y = (s[6]-'0')*1000 + (s[7]-'0')*100 + (s[8]-'0')*10 + s[9]-'0';
+
+    if(d == 0 || m == 0 || Y < 1970 || m > 12) return false;
+    if((m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12) &&
+        d > 31) return false;
+    if((m == 4 || m == 6 || m == 9 || m == 11) && d > 30) return false;
+    if(Y%4 == 0 && m == 2 && d > 29) return false;
+    if(Y%4 != 0 && m == 2 && d > 28) return false;
+
+    return true;
 }
 
 void screen::init(database &db)
@@ -118,7 +149,7 @@ void screen::manage_task(database &db)
         std::cout << "Opção: ";
         std::getline(std::cin, opt);
         
-        if(!opt.compare("1")) return;
+        if(!opt.compare("1")) screen::create_task(db);
         if(!opt.compare("2")) return;
         else if(!opt.compare("9")) return;
     }
@@ -205,6 +236,7 @@ void screen::create_project(database &db)
     { 
         if(stage == 1)
         {
+            partner_set.clear();
             buffer.clear();
             buffer << "\033[2J\033[1;1H";
             buffer << "Cadastrar projeto:" << std::endl;
@@ -271,6 +303,98 @@ void screen::create_project(database &db)
         {
             std::cout << buffer.str();
             std::cout << "Deseja adicionar mais projetos?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
+        }
+    }
+}
+
+void screen::create_task(database &db)
+{
+    
+    std::stringstream buffer;
+    std::string description = "", opt = "";
+    u_int project = 0, partner = 0;
+    u_long dead_line;
+    bool no_partners;
+
+    u_char stage = 1;
+    while(1)
+    { 
+        if(stage == 1)
+        {
+            no_partners = false;
+            buffer.clear();
+            buffer << "\033[2J\033[1;1H";
+            buffer << "Cadastrar tarefa:" << std::endl;
+            buffer << std::endl;
+            buffer << "Descrição: ";
+            std::cout << buffer.str();
+            std::getline(std::cin, description);
+            buffer << description << std::endl;
+
+            stage = 2;
+        }
+        else if(stage == 2)
+        {
+            std::cout << buffer.str();
+            if(no_partners)
+                std::cout << "Este projeto não tem colaboradores." << std::endl;
+            std::cout << "Adicione um projeto que tenha colaboradores. ";
+            std::cout << "Adicionar ou cancelar?(a/c) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'a'))
+            {
+                manager::project p = get_project(db);
+                project = p._code;
+                if(p._code)
+                {
+                    if(p._partners.size())
+                    {
+                        buffer << "Project: " << p._code << " - ";
+                        buffer << p._name << std::endl;
+                        stage = 3;
+                    }
+                    else
+                        no_partners = true;
+                }
+            }
+            else if(is_letter(opt,'c'))
+                stage = 5; 
+        }
+        else if(stage == 3)
+        {
+            std::cout << buffer.str() << std::endl;
+            manager::project p = db.search_project(project);
+            
+            for(std::set<u_int>::iterator it = p._partners.begin();
+                it != p._partners.end(); ++it)
+                std::cout << db.search_partner(*it) << std::endl;
+            
+            std::cout << std::endl << "Escolha um colaborador: ";
+            std::getline(std::cin, opt);
+            char * v;
+            partner = strtoul(opt.c_str(),&v,10);
+            if(!(*v || 
+                opt.find('-') != std::string::npos ||
+                opt.find('+') != std::string::npos))
+                {
+                    manager::partner pt = db.search_partner(partner);
+                    if(pt._code)
+                    {
+                        buffer << "Colaborador: " << pt._code << " - ";
+                        buffer << pt._name << std::endl;
+                        stage = 5;
+                    }
+                }
+        }
+        else if(stage == 5)
+        {
+            std::cout << buffer.str();
+            std::cout << "Deseja adicionar mais tarefas?(s/n) ";
             std::getline(std::cin, opt);
             if(is_letter(opt,'s'))
                 stage = 1;

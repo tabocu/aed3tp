@@ -12,6 +12,7 @@ namespace screen
     void manage_task(database &db);
     void create_partner(database &db);
     void create_project(database &db);
+    void create_task(database &db);
     manager::partner get_partner(database &db);
     manager::project get_project(database &db);
 }
