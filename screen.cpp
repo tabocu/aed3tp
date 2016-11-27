@@ -38,9 +38,34 @@ void screen::init(database &db)
         std::cout << "Opção: ";
         std::getline(std::cin, opt);
         
-        if(!opt.compare("1")) return;
+        if(!opt.compare("1")) screen::manage_partner(db);
         else if(!opt.compare("2")) return;
         else if(!opt.compare("3")) return;
+        else if(!opt.compare("9")) return;
+    }
+}
+
+void screen::manage_partner(database &db)
+{
+     std::string opt = "";
+
+    while(1)
+    {
+        std::cout << "\033[2J\033[1;1H";
+        std::cout << "Project Manager" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Gerenciar Colaborador" << std::endl;
+        std::cout << std::endl;
+        std::cout << "(1) Criar colaborador" << std::endl;
+        std::cout << "(2) Pesquisar colaborador"      << std::endl;
+        std::cout << std::endl;
+        std::cout << "(9) Voltar" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Opção: ";
+        std::getline(std::cin, opt);
+        
+        if(!opt.compare("1")) screen::create_partner(db);
+        else if(!opt.compare("2")) screen::get_partner(db);
         else if(!opt.compare("9")) return;
     }
 }
