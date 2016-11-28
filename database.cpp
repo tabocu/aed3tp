@@ -139,17 +139,27 @@ manager::task database::search_task(const u_int &code)
     return _task_record.search(code);
 }
 
-std::list<manager::project> database::list_project()
+std::list<manager::project>* database::list_project()
 {
     return _project_record.list();
 }
 
-std::list<manager::partner> database::list_partner()
+std::list<manager::partner>* database::list_partner()
 {
     return _partner_record.list();
 }
 
-std::list<manager::task> database::list_task()
+std::list<manager::task>* database::list_task()
 {
     return _task_record.list();
+}
+
+std::list<u_int>* database::list_task_project(const u_int &project)
+{
+    return _project_task_index.list(project);
+}
+
+std::list<u_int>* database::list_task_partner(const u_int &partner)
+{
+    return _partner_task_index.list(partner);
 }

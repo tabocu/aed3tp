@@ -18,21 +18,23 @@ public:
     manager::project search_project(const u_int &code);
     manager::project search_project(const std::string &name);
     bool update_project(manager::project &project);
-    std::list<manager::project> list_project();
+    std::list<manager::project>* list_project();
+    std::list<u_int>* list_task_project(const u_int &project);
 
     void insert_partner(manager::partner &partner);
     bool remove_partner(manager::partner &partner);
     manager::partner search_partner(const u_int &code);
     manager::partner search_partner(const std::string &name);
     bool update_partner(manager::partner &partner);
-    std::list<manager::partner> list_partner();
+    std::list<manager::partner>* list_partner();
+    std::list<u_int>* list_task_partner(const u_int &partner);
     
     bool validate_partners_name(const std::string &name);
     bool validate_project_partners(manager::project &project);
     
     void insert_task(manager::task &task);
     manager::task search_task(const u_int &code);
-    std::list<manager::task> list_task();
+    std::list<manager::task>* list_task();
 
 #ifndef DEBUG   
 private:

@@ -136,9 +136,9 @@ public:
         return _index.remove(t._code);
     }
 
-    std::list<T> list()
+    std::list<T>* list()
     {
-        std::list<T> t_vec;
+        std::list<T>* t_vec = new std::list<T>();
         
         u_int size = datafile::size(_file);
 
@@ -160,7 +160,7 @@ public:
 
             if(tbt == tombstone::alive)
             {
-                t_vec.push_back(t);
+                t_vec->push_back(t);
             }
         }
         return t_vec;

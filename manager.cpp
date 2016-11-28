@@ -26,20 +26,19 @@ void print_string(std::ostream &os, const std::string &s)
 void print_priority(std::ostream &os, const manager::priority &p)
 {
     os << "| ";
-    os.width(10);
     switch(p)
     {
         case manager::priority::lowest:
-            os << std::left << "1 - Baixa";
+            os << std::left << "1 - Baixa      ";
             break;
         case manager::priority::low:
             os << std::left << "2 - Média baixa";
             break;
         case manager::priority::high:
-            os << std::left << "3 - Média alta";
+            os << std::left << "3 - Média alta ";
             break;
         case manager::priority::highest:
-            os << std::left << "4 - Alta";
+            os << std::left << "4 - Alta       ";
             break;
         default:
             os << std::left << "N/A";
