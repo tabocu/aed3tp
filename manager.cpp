@@ -174,8 +174,6 @@ void manager::task::print(std::ostream &os) const
 {
     entry::print(os);
     print_string(os,_description);
-    print_u_int(os,_project);
-    print_u_int(os,_partner);
     os << "| " << _dead_line << " |";
     print_priority(os,_priority);
 }

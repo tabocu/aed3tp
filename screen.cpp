@@ -93,6 +93,7 @@ void screen::manage_partner(database &db)
         std::cout << std::endl;
         std::cout << "(1) Criar colaborador" << std::endl;
         std::cout << "(2) Pesquisar colaborador"      << std::endl;
+        std::cout << "(3) Listar colaboradores"      << std::endl;
         std::cout << std::endl;
         std::cout << "(9) Voltar" << std::endl;
         std::cout << std::endl;
@@ -101,6 +102,7 @@ void screen::manage_partner(database &db)
         
         if(!opt.compare("1")) screen::create_partner(db);
         else if(!opt.compare("2")) screen::get_partner(db);
+        else if(!opt.compare("3")) screen::list_partner(db);
         else if(!opt.compare("9")) return;
     }
 }
@@ -118,6 +120,7 @@ void screen::manage_project(database &db)
         std::cout << std::endl;
         std::cout << "(1) Criar projeto" << std::endl;
         std::cout << "(2) Pesquisar projeto" << std::endl;
+        std::cout << "(3) Listar projetos" << std::endl;
         std::cout << std::endl;
         std::cout << "(9) Voltar" << std::endl;
         std::cout << std::endl;
@@ -126,6 +129,7 @@ void screen::manage_project(database &db)
         
         if(!opt.compare("1")) screen::create_project(db);
         if(!opt.compare("2")) screen::get_project(db);
+        if(!opt.compare("3")) screen::list_project(db);
         else if(!opt.compare("9")) return;
     }
 }
@@ -143,6 +147,7 @@ void screen::manage_task(database &db)
         std::cout << std::endl;
         std::cout << "(1) Criar tarefa" << std::endl;
         std::cout << "(2) Pesquisar tarefa" << std::endl;
+        std::cout << "(3) Listar tarefas" << std::endl;
         std::cout << std::endl;
         std::cout << "(9) Voltar" << std::endl;
         std::cout << std::endl;
@@ -151,6 +156,7 @@ void screen::manage_task(database &db)
         
         if(!opt.compare("1")) screen::create_task(db);
         if(!opt.compare("2")) screen::get_task(db);
+        if(!opt.compare("3")) screen::list_task(db);
         else if(!opt.compare("9")) return;
     }
 }
@@ -695,7 +701,13 @@ manager::task screen::get_task(database &db)
             manager::task t = db.search_task(code);
             code = t._code;
             if(code)
+            {
                 buffer << t << std::endl;
+                buffer << "Projeto: " << std::endl;
+                buffer << db.search_project(t._project) << std::endl;
+                buffer << "Colaborador: " << std::endl;
+                buffer << db.search_partner(t._partner) << std::endl;
+            }
             else
                 buffer << "Tarefa não encontrada!" << std::endl;
 
@@ -715,5 +727,62 @@ manager::task screen::get_task(database &db)
             }
             else if(is_letter(opt,'n')) return db.search_task(code);
         }
+    }
+}
+
+void screen::list_project(database &db)
+{
+    std::stringstream buffer;
+    std::string opt;
+    
+    buffer << "\033[2J\033[1;1H";
+    buffer << "Projetos: " << std::endl << std::endl;
+    std::list<manager::project> list = db.list_project();
+    for(auto p : list)
+        buffer << p << std::endl;
+
+    while(!is_letter(opt,'x'))
+    {
+        std::cout << buffer.str() << std::endl << std::endl;
+        std::cout << "Digite (x) para sair: ";
+        std::getline(std::cin, opt);
+    }
+}
+
+void screen::list_partner(database &db)
+{
+    std::stringstream buffer;
+    std::string opt;
+    
+    buffer << "\033[2J\033[1;1H";
+    buffer << "Colaboradores: " << std::endl << std::endl;
+    std::list<manager::partner> list = db.list_partner();
+    for(auto p : list)
+        buffer << p << std::endl;
+
+    while(!is_letter(opt,'x'))
+    {
+        std::cout << buffer.str() << std::endl << std::endl;
+        std::cout << "Digite (x) para sair: ";
+        std::getline(std::cin, opt);
+    }
+}
+
+void screen::list_task(database &db)
+{
+    std::stringstream buffer;
+    std::string opt;
+    
+    buffer << "\033[2J\033[1;1H";
+    buffer << "Tarefas: " << std::endl << std::endl;
+    std::list<manager::task> list = db.list_task();
+    for(auto p : list)
+        buffer << p << std::endl;
+
+    while(!is_letter(opt,'x'))
+    {
+        std::cout << buffer.str() << std::endl << std::endl;
+        std::cout << "Digite (x) para sair: ";
+        std::getline(std::cin, opt);
     }
 }

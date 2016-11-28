@@ -16,6 +16,9 @@ namespace screen
     manager::partner get_partner(database &db);
     manager::project get_project(database &db);
     manager::task get_task(database &db);
+    void list_project(database &db);
+    void list_partner(database &db);
+    void list_task(database &db);
 }
 
 

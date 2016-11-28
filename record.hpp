@@ -136,6 +136,36 @@ public:
         return _index.remove(t._code);
     }
 
+    std::list<T> list()
+    {
+        std::list<T> t_vec;
+        
+        u_int size = datafile::size(_file);
+
+        _file.seekg(4, _file.beg);
+
+        char tbt;
+        while(_file.tellg() < size)
+        {
+            tbt = _file.get();
+
+            T t;
+
+            u_short size = datafile::read_short(_file);
+
+            char * buffer = new char[size];
+            _file.read(buffer,size);
+            t.write(buffer);
+            delete[] buffer;
+
+            if(tbt == tombstone::alive)
+            {
+                t_vec.push_back(t);
+            }
+        }
+        return t_vec;
+    }
+
 #ifndef DEBUG
 private:
 #endif

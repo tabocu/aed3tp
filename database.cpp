@@ -138,3 +138,18 @@ manager::task database::search_task(const u_int &code)
 {
     return _task_record.search(code);
 }
+
+std::list<manager::project> database::list_project()
+{
+    return _project_record.list();
+}
+
+std::list<manager::partner> database::list_partner()
+{
+    return _partner_record.list();
+}
+
+std::list<manager::task> database::list_task()
+{
+    return _task_record.list();
+}
