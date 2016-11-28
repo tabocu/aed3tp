@@ -129,10 +129,6 @@ public:
 
         _file.put(tombstone::dead);
 
-        _file.seekg(0,_file.end);
-
-        _file.put(tombstone::alive);
-
         return _index.remove(t._code);
     }
 

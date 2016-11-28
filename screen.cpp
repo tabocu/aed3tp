@@ -124,6 +124,7 @@ void screen::manage_project(database &db)
         std::cout << "(2) Pesquisar projeto" << std::endl;
         std::cout << "(3) Listar projetos" << std::endl;
         std::cout << "(4) Listar tarefas de projeto" << std::endl;
+        std::cout << "(5) Deletar projeto" << std::endl;
         std::cout << std::endl;
         std::cout << "(9) Voltar" << std::endl;
         std::cout << std::endl;
@@ -134,6 +135,7 @@ void screen::manage_project(database &db)
         if(!opt.compare("2")) screen::get_project(db);
         if(!opt.compare("3")) screen::list_project(db);
         if(!opt.compare("4")) screen::list_task_project(db);
+        if(!opt.compare("5")) screen::remove_project(db);
         else if(!opt.compare("9")) return;
     }
 }
@@ -152,6 +154,7 @@ void screen::manage_task(database &db)
         std::cout << "(1) Criar tarefa" << std::endl;
         std::cout << "(2) Pesquisar tarefa" << std::endl;
         std::cout << "(3) Listar tarefas" << std::endl;
+        std::cout << "(4) Deletar tarefa" << std::endl;
         std::cout << std::endl;
         std::cout << "(9) Voltar" << std::endl;
         std::cout << std::endl;
@@ -161,6 +164,7 @@ void screen::manage_task(database &db)
         if(!opt.compare("1")) screen::create_task(db);
         if(!opt.compare("2")) screen::get_task(db);
         if(!opt.compare("3")) screen::list_task(db);
+        if(!opt.compare("4")) screen::remove_task(db);
         else if(!opt.compare("9")) return;
     }
 }
@@ -851,5 +855,119 @@ void screen::list_task_partner(database &db)
     }
 }
 
+void screen::remove_project(database &db)
+{
+    std::stringstream buffer;
+    std::string opt;
+    u_int code;
+
+    u_int stage = 1;
+
+    while(1)
+    {
+        if(stage == 1)
+        {
+            buffer.clear();
+            manager::project t = get_project(db);
+            code = t._code;
+            if(t._code)
+            {    
+                buffer << "\033[2J\033[1;1H";
+                buffer << "Projeto a ser excluid0: " << std::endl << std::endl;
+                buffer << t << std::endl;
+                std::list<u_int> *list = db.list_task_project(t._code);
+                if(list->empty())
+                    stage = 2;
+                else
+                {
+                    buffer << "Este projeto possui dependências. ";
+                    buffer << "Ele não pode ser excluido" << std::endl;
+                    stage = 3;
+                }
+                delete list;
+            }
+            else
+                stage = 3;
+        }
+        else if(stage == 2)
+        {
+            std::cout << buffer.str() << std::endl << std::endl;
+            std::cout << "Deseja excluir esse projeto?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+            {
+                manager::project t = db.search_project(code);
+                db.remove_project(t);
+                buffer << std::endl << "Projeto excluido" << std::endl;
+                stage = 3;
+            }
+            else if(is_letter(opt,'n'))
+                stage = 3;
+        }
+        else if(stage == 3)
+        {
+            std::cout << buffer.str() << std::endl << std::endl;
+            std::cout << "Deseja excluir outro projeto?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
+        }
+    }
+}
+
+void screen::remove_task(database &db)
+{
+    std::stringstream buffer;
+    std::string opt;
+    u_int code;
+
+    u_int stage = 1;
+
+    while(1)
+    {
+        if(stage == 1)
+        {
+            buffer.clear();
+            manager::task t = get_task(db);
+            code = t._code;
+            if(t._code)
+            {    
+                buffer << "\033[2J\033[1;1H";
+                buffer << "Tarefa a ser excluida: " << std::endl << std::endl;
+                buffer << t << std::endl;
+                stage = 2;
+            }
+            else
+                stage = 3;
+        }
+        else if(stage == 2)
+        {
+            std::cout << buffer.str() << std::endl << std::endl;
+            std::cout << "Deseja excluir essa tarefa?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+            {
+                manager::task t = db.search_task(code);
+                db.remove_task(t);
+                buffer << std::endl << "Tarefa excluida" << std::endl;
+                stage = 3;
+            }
+            else if(is_letter(opt,'n'))
+                stage = 3;
+        }
+        else if(stage == 3)
+        {
+            std::cout << buffer.str() << std::endl << std::endl;
+            std::cout << "Deseja excluir outra tarefa?(s/n) ";
+            std::getline(std::cin, opt);
+            if(is_letter(opt,'s'))
+                stage = 1;
+            else if(is_letter(opt,'n'))
+                return;
+        }
+    }
+}
 
 

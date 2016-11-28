@@ -35,6 +35,8 @@ public:
     void insert_task(manager::task &task);
     manager::task search_task(const u_int &code);
     std::list<manager::task>* list_task();
+    void remove_task(manager::task &task);
+
 
 #ifndef DEBUG   
 private:

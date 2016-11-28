@@ -134,6 +134,13 @@ void database::insert_task(manager::task &task)
     _partner_task_index.insert(task._partner,task._code);
 }
 
+void database::remove_task(manager::task &task)
+{
+    _task_record.remove(task);
+    _project_task_index.remove(task._project,task._code);
+    _partner_task_index.remove(task._partner,task._code);
+}
+
 manager::task database::search_task(const u_int &code)
 {
     return _task_record.search(code);

@@ -21,6 +21,8 @@ namespace screen
     void list_task(database &db);
     void list_task_project(database &db);
     void list_task_partner(database &db);
+    void remove_project(database &db);
+    void remove_task(database &db);
 }
 
 
